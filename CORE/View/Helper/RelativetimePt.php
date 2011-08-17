@@ -1,6 +1,6 @@
 <?php
 
-class CORE_View_Helper_Relativetime
+class CORE_View_Helper_RelativetimePt
 {
   public function relativetime($unixtime, $accuracy = 2, $splitter = ', ')
   {
@@ -26,12 +26,12 @@ class CORE_View_Helper_Relativetime
     );
 
     $translations = array(
-      'year' => array('year', 'years'),
-      'week' => array('week', 'weeks'),
-      'day' => array('day', 'days'),
-      'h' => array('hour', 'hours'),
-      'min' => array('minute', 'minutes'),
-      's' => array('second', 'seconds')
+      'year' => array('ano', 'anos'),
+      'week' => array('semana', 'semanas'),
+      'day' => array('dia', 'dias'),
+      'h' => array('hora', 'horas'),
+      'min' => array('minuto', 'minutos'),
+      's' => array('segundo', 'segundos')
     );
 
     $measure = array();
@@ -66,10 +66,6 @@ class CORE_View_Helper_Relativetime
       $str .= $val . ' ' . $unit . $splitter;
     }
 
-    if( strlen(substr($str, 0, 0 - strlen($splitter))) > 0 )
-        return substr($str, 0, 0 - strlen($splitter)) . ' ago';
-    else
-        return '0 seconds ago';
-
+    return substr($str, 0, 0 - strlen($splitter));
   }
 }

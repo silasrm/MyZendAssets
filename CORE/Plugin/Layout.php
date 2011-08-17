@@ -6,7 +6,16 @@ class CORE_Plugin_Layout extends Zend_Controller_Plugin_Abstract
     {
         $layout = Zend_Layout::getMvcInstance();
 
-        $layout->setLayout( 'layout' )->setLayoutPath( APPLICATION_PATH . '/modules/' . $request->getModuleName() . '/views/layout/' );
+        $layout->setLayout( 'layout' )
+        		->setLayoutPath( APPLICATION_PATH . '/modules/' . $request->getModuleName() . '/views/layout/' );
+
+        if( $request->getModuleName() == 'admin'
+        	&& $request->getControllerName() == 'candidato'
+        	&& $request->getActionName() == 'visualizar'
+            && $request->getParam('print') == 'true' )
+        {
+        	$layout->setLayout( 'print' );
+        }
     }
 }
 ?>

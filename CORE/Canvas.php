@@ -11,7 +11,7 @@
  * TODO:
 */
 
-class CORE_Plugin_Canvas extends Zend_Controller_Plugin_Abstract
+class CORE_Canvas extends Zend_Controller_Plugin_Abstract
 {
     // arquivos
     private $origem, $img, $img_temp;
@@ -37,7 +37,7 @@ class CORE_Plugin_Canvas extends Zend_Controller_Plugin_Abstract
             $this->dados();
 
         // RGB padrão -> branco
-        $this->rgb( 255, 255, 255 );
+        $this->rgb( 255, 255, 255 );;
     } // fim construtor
 
     /**
@@ -56,15 +56,15 @@ class CORE_Plugin_Canvas extends Zend_Controller_Plugin_Abstract
             // verifica se é imagem
             if ( !$this->eImagem() )
             {
-                    trigger_error( 'Erro: Arquivo '.$this->origem.' não é uma imagem!', E_USER_ERROR );
+                trigger_error( 'Erro: Arquivo '.$this->origem.' não é uma imagem!', E_USER_ERROR );
             }
             else
             {
-                    // pega dimensões
-                    $this->dimensoes();
+                // pega dimensões
+                $this->dimensoes();
 
-                    // cria imagem para php
-                    $this->criaImagem();
+                // cria imagem para php
+                $this->criaImagem();
             }
         }
         else

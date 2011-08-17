@@ -50,42 +50,12 @@
 
         public function save()
         {
-            $this->getMapper()->save($this);
-        }
-
-        public function fetchAll( Zend_Db_Select $select = null )
-        {
-            return $this->getMapper()->fetchAll($select);
-        }
-
-        public function count( Zend_Db_Select $select = null )
-        {
-            return $this->getMapper()->count($select);
-        }
-
-        public function find( $id )
-        {
-            return $this->getMapper()->find($id);
-        }
-
-        public function getAsArray( $id )
-        {
-            return $this->getMapper()->getAsArray($id);
+            return $this->getMapper()->save($this);
         }
 
         public function delete()
         {
             return $this->getMapper()->delete($this);
-        }
-
-        public function getLastInsertId()
-        {
-            return $this->getMapper()->getLastInsertId();
-        }
-
-        public function toArray()
-        {
-            return $this->getMapper()->toArray($this);
         }
 
         public function __call( $name, $arguments )
@@ -96,7 +66,9 @@
             if( method_exists( $this->getMapper(), $name ) 
                 && is_callable( array( $this->getMapper(), $name ) ) ) 
             {
-                return $this->getMapper()->$name( implode( ',', $arguments ) );
+                return call_user_func_array( array( $this->getMapper()
+                                                    , $name )
+                                            , $arguments );
             }
         }
     }

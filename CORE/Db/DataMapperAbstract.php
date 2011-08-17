@@ -27,9 +27,9 @@
         public function save( CORE_Db_DomainObjectAbstract $obj )
         {
             if( is_null($obj->getId()) )
-                $this->_insert($obj);
+                return $this->_insert($obj);
             else
-                $this->_update($obj);
+                return $this->_update($obj);
         }
 
         public function count( Zend_Db_Select $select = null )
@@ -88,6 +88,27 @@
             return $row->delete();
         }
 
+        public function deleteCollection( array $ids )
+        {
+            $count = 0;
+
+            foreach( $ids as $id )
+            {
+                $result = $this->getDbTable()->find( (int) $id );
+
+                if( 0 == count($result) )
+                    return false;
+
+                $row = $result->current();
+                
+                if( $row->delete() )
+                    $count++;
+            }
+
+            return $count;
+            
+        }
+
         protected function _populate( $data )
         {
             $obj = new $this->_model;
@@ -95,6 +116,7 @@
             foreach( $data as $k => $v )
             {
                 $method = 'set' . ucfirst($k);
+
                 if( !method_exists($obj, $method) )
                 {
                     throw new Exception('Invalid property - ' . $method);
