@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * Função para usar no lugar da sql_regcase() que foi depreciada no PHP 5.3. Depende da extensão mbstring.
+ */
 function mb_sql_regcase( $string, $encoding='auto' )
 {
   	$max = mb_strlen( $string, $encoding );
@@ -16,7 +19,3 @@ function mb_sql_regcase( $string, $encoding='auto' )
 
   	return $ret;
 } 
-
-echo mb_sql_regcase('silas');
-echo '<hr/>';
-echo sql_regcase('silas');
