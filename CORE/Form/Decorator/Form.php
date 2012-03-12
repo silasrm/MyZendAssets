@@ -52,7 +52,7 @@
                             array('Description',array('tag'=>'','escape'=>false)),
                             #'Errors',
                             array(array('data'=>'HtmlTag'), array('tag' => 'dd','escape'=>false)),
-                            array('Label', array('tag' => 'dt','escape'=>false)),
+                            array('Label', array('tag' => 'dt','escape'=>false, 'requiredSuffix' => '<span class="required">*</span>')),
                             array(array('row'=>'HtmlTag'), array('tag'=>'dl'))
                         );
                     break;
