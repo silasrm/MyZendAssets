@@ -1,1 +1,3 @@
 Classes e outros recursos genéricos usados no Zend Framework em alguns projetos.
+
+* Atualizada a pasta CORE para novo padrão usado. A antiga chama-se CORE.OLD.
