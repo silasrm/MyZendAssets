@@ -37,7 +37,7 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
             $this->dados();
 
         // RGB padrão -> branco
-        $this->rgb( 255, 255, 255 );;
+        $this->rgb( 255, 255, 255 );
     } // fim construtor
 
     /**
@@ -56,20 +56,20 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
             // verifica se é imagem
             if ( !$this->eImagem() )
             {
-                trigger_error( 'Erro: Arquivo '.$this->origem.' não é uma imagem!', E_USER_ERROR );
+                    trigger_error( 'Erro: Arquivo '.$this->origem.' não é uma imagem!', E_USER_ERROR );
             }
             else
             {
-                // pega dimensões
-                $this->dimensoes();
+                    // pega dimensões
+                    $this->dimensoes();
 
-                // cria imagem para php
-                $this->criaImagem();
+                    // cria imagem para php
+                    $this->criaImagem();
             }
         }
         else
         {
-            trigger_error( 'Erro: Arquivo de imagem não encontrado!', E_USER_ERROR );
+            trigger_error( 'Erro: Arquivo de imagem ('.$this->origem.') não encontrado!', E_USER_ERROR );
         }
     } // fim dadosImagem
 
@@ -148,7 +148,8 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
         $this->largura = $largura;
         $this->altura = $altura;
         $this->img = imagecreatetruecolor( $this->largura, $this->altura );
-        $cor_fundo = imagecolorallocate( $this->img, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+        #$cor_fundo = imagecolorallocate( $this->img, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+        $cor_fundo = imagecolorallocatealpha( $this->img, $this->rgb[0], $this->rgb[1], $this->rgb[2], 127 );
         imagefill( $this->img, 0, 0, $cor_fundo );
         $this->extensao = 'jpg';
 
@@ -345,8 +346,18 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
     {
         // cria imagem de destino temporária
         $this->img_temp	= imagecreatetruecolor( $this->nova_largura, $this->nova_altura );
+        imagealphablending( $this->img_temp, false );
+        imagecopyresampled( $this->img_temp
+                            , $this->img
+                            , 0
+                            , 0
+                            , 0
+                            , 0
+                            , $this->nova_largura
+                            , $this->nova_altura
+                            , $this->largura
+                            , $this->altura );
 
-        imagecopyresampled( $this->img_temp, $this->img, 0, 0, 0, 0, $this->nova_largura, $this->nova_altura, $this->largura, $this->altura );
         $this->img = $this->img_temp;
     } // fim redimensionaSimples()
 
@@ -357,7 +368,8 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
     */
     private function preencheImagem()
     {
-        $cor_fundo = imagecolorallocate( $this->img_temp, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+        #$cor_fundo = imagecolorallocate( $this->img_temp, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+        $cor_fundo = imagecolorallocatealpha( $this->img_temp, $this->rgb[0], $this->rgb[1], $this->rgb[2], 127 );
         imagefill( $this->img_temp, 0, 0, $cor_fundo );
     } // fim preencheImagem
 
@@ -395,7 +407,18 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
         // copia com o novo tamanho, centralizando
         $dif_x = ( $dif_x - $dif_w ) / 2;
         $dif_y = ( $dif_y - $dif_h ) / 2;
-        imagecopyresampled( $this->img_temp, $this->img, $dif_x, $dif_y, 0, 0, $dif_w, $dif_h, $this->largura, $this->altura );
+        imagealphablending( $this->img_temp, false );
+        imagecopyresampled( $this->img_temp
+                            , $this->img
+                            , $dif_x
+                            , $dif_y
+                            , 0
+                            , 0
+                            , $dif_w
+                            , $dif_h
+                            , $this->largura
+                            , $this->altura );
+
         $this->img = $this->img_temp;
     } // fim redimensionaPreenchimento()
 
@@ -454,17 +477,17 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
 
         // adiciona cor de fundo à nova imagem
         $this->preencheImagem();
-
+        imagealphablending( $this->img_temp, false );
         imagecopyresampled( $this->img_temp
-                                            , $this->img
-                                            , -$this->posicao_crop[0]
-                                            , -$this->posicao_crop[1]
-                                            , 0
-                                            , 0
-                                            , $this->posicao_crop[2]
-                                            , $this->posicao_crop[3]
-                                            , $this->largura
-                                            , $this->altura );
+                            , $this->img
+                            , -$this->posicao_crop[0]
+                            , -$this->posicao_crop[1]
+                            , 0
+                            , 0
+                            , $this->posicao_crop[2]
+                            , $this->posicao_crop[3]
+                            , $this->largura
+                            , $this->altura );
 
         $this->img = $this->img_temp;
     } // fim redimensionaCrop
@@ -486,17 +509,17 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
 
         // adiciona cor de fundo à nova imagem
         $this->preencheImagem();
-        
+        imagealphablending( $this->img_temp, false );
         imagecopyresampled( $this->img_temp
-                                            , $this->img
-                                            , -( ( ( $this->largura / 2 ) - ( $this->nova_largura / 2 ) ) / 2 )
-                                            , 0
-                                            , 0
-                                            , ( ( $this->altura - $this->nova_altura ) / 2 )
-                                            , (int)( ( ( $this->largura - $this->nova_largura )/2 ) + $this->nova_largura )
-                                            , $this->altura
-                                            , $this->largura
-                                            , $this->altura );
+                            , $this->img
+                            , -( ( ( $this->largura / 2 ) - ( $this->nova_largura / 2 ) ) / 2 )
+                            , 0
+                            , 0
+                            , ( ( $this->altura - $this->nova_altura ) / 2 )
+                            , (int)( ( ( $this->largura - $this->nova_largura )/2 ) + $this->nova_largura )
+                            , $this->altura
+                            , $this->largura
+                            , $this->altura );
 
         $this->img = $this->img_temp;
     } // fim redimensionaCrop
@@ -544,9 +567,10 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
     */
     public function gira( $graus )
     {
-        $cor_fundo = imagecolorallocate( $this->img, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+        #$cor_fundo = imagecolorallocate( $this->img, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+        $cor_fundo = imagecolorallocatealpha( $this->img, $this->rgb[0], $this->rgb[1], $this->rgb[2], 127 );
         $this->img = imagerotate( $this->img, $graus, $cor_fundo );
-        imagealphablending( $this->img, true );
+        imagealphablending( $this->img, false );
         imagesavealpha( $this->img, true );
         $this->largura = imagesx( $this->img );
         $this->altura = imagesx( $this->img );
@@ -606,7 +630,8 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
             }
 
             $this->img_temp = imagecreatetruecolor( $largura_texto, $altura_texto );
-            $cor_fundo = imagecolorallocate( $this->img_temp, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+            #$cor_fundo = imagecolorallocate( $this->img_temp, $this->rgb[0], $this->rgb[1], $this->rgb[2] );
+            $cor_fundo = imagecolorallocatealpha( $this->img_temp, $this->rgb[0], $this->rgb[1], $this->rgb[2], 127 );
             imagefill( $this->img_temp, 0, 0, $cor_fundo );
 
             imagecopy( $this->img, $this->img_temp, $x, $y, 0, 0, $largura_texto, $altura_texto );
@@ -937,7 +962,7 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
      * @param Int $qualidade qualidade da imagem no caso de JPEG (0-100)
      * @return void
     */
-    public function grava( $destino='', $qualidade = 100 )
+    public function grava( $destino='', $qualidade = 100, $forcePng = false )
     {
         // dados do arquivo de destino
         if ( $destino )
@@ -958,52 +983,71 @@ class CORE_Canvas extends Zend_Controller_Plugin_Abstract
             $extensao_destino = $this->extensao;
         }
 
-        switch( $extensao_destino )
+        if( $forcePng )
         {
-            case 'jpg':
-            case 'jpeg':
-            case 'bmp':
-                if ( $destino )
-                {
-                    imagejpeg( $this->img, $destino, $qualidade );
-                }
-                else
-                {
-                    header( "Content-type: image/jpeg" );
-                    imagejpeg( $this->img, NULL, $qualidade );
-                    imagedestroy( $this->img );
-                    exit;
-                }
-                break;
-            case 'png':
-                if ( $destino )
-                {
-                    imagepng( $this->img, $destino );
-                }
-                else
-                {
-                    header( "Content-type: image/png" );
-                    imagepng( $this->img );
-                    imagedestroy( $this->img );
-                    exit;
-                }
-                break;
-            case 'gif':
-                if ( $destino )
-                {
-                    imagegif( $this->img, $destino );
-                }
-                else
-                {
-                    header( "Content-type: image/gif" );
-                    imagegif( $this->img );
-                    imagedestroy( $this->img );
-                    exit;
-                }
-                break;
-            default:
-                return false;
-                break;
+            if ( $destino )
+            {
+                imagesavealpha( $this->img, true );
+                imagepng( $this->img, $destino );
+            }
+            else
+            {
+                header( "Content-type: image/png" );
+                imagepng( $this->img );
+                imagedestroy( $this->img );
+                exit;
+            }
+        }
+        else
+        {
+            switch( $extensao_destino )
+            {
+                case 'jpg':
+                case 'jpeg':
+                case 'bmp':
+                    if ( $destino )
+                    {
+                        imagejpeg( $this->img, $destino, $qualidade );
+                    }
+                    else
+                    {
+                        header( "Content-type: image/jpeg" );
+                        imagejpeg( $this->img, NULL, $qualidade );
+                        imagedestroy( $this->img );
+                        exit;
+                    }
+                    break;
+                case 'png':
+                    if ( $destino )
+                    {
+                        imagesavealpha( $this->img, true );
+                        imagepng( $this->img, $destino );
+                    }
+                    else
+                    {
+                        header( "Content-type: image/png" );
+                        imagepng( $this->img );
+                        imagedestroy( $this->img );
+                        exit;
+                    }
+                    break;
+                case 'gif':
+                    if ( $destino )
+                    {
+                        imagegif( $this->img, $destino );
+                    }
+                    else
+                    {
+                        header( "Content-type: image/gif" );
+                        imagegif( $this->img );
+                        imagedestroy( $this->img );
+                        exit;
+                    }
+                    break;
+                default:
+                    return false;
+                    break;
+            }
         }
 
     } // fim grava

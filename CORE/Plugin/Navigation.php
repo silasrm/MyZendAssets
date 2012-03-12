@@ -8,7 +8,7 @@ class CORE_Plugin_Navigation extends Zend_Controller_Plugin_Abstract
 
         if( empty( $module ) )
             $module = "default";
-
+        
         if( file_exists(APPLICATION_PATH . '/configs/' . strtolower($module) . 'Navigation.xml') )
         {
             $config = new Zend_Config_Xml(APPLICATION_PATH . '/configs/' . strtolower($module) . 'Navigation.xml', 'nav');

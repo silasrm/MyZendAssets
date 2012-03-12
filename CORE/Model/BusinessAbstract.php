@@ -7,7 +7,7 @@
 		@package CORE
 		@version 0.1
 	 */
-	abstract class CORE_BusinessAbstract
+	abstract class CORE_Model_BusinessAbstract
 	{
 		protected $model = array();
 		protected $objModel = array();

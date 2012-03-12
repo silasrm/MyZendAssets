@@ -1,6 +1,6 @@
 <?php
 
-    abstract class CORE_SimpleModelAbstract
+    abstract class CORE_Model_SimpleModelAbstract
     {
         protected $_options = array();
 
@@ -12,12 +12,12 @@
             return $this;
         }
 
-        public function getPair()
+        public function fetchPair()
         {
             return $this->_options;
         }
 
-        public function get( $id )
+        public function find( $id )
         {
             if( array_key_exists( $id, $this->_options ) )
                 return $this->_options[ $id ];
