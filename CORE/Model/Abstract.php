@@ -49,7 +49,7 @@ abstract class CORE_Model_Abstract
 
         if (!is_null($conditions)) {
             foreach ($conditions as $ky => $condition) {
-                $sql->where($ky, $condition);
+                $query->where($ky, $condition);
             }
         }
         
