@@ -23,7 +23,7 @@ class CORE_Validate_DataEntrePeriodo extends Zend_Validate_Abstract
  
     protected $_messageTemplates = array(
         self::NOT_DATE => "'%value%' não é uma data válida",
-        self::NOT_BETWEEN => "'%value%' deve está entre '%min%' ( %maxIdade% anos ) e '%max%'  ( %minIdade% anos )"
+        self::NOT_BETWEEN => "'%value%' deve estar entre '%min%' ( %maxIdade% anos ) e '%max%'  ( %minIdade% anos )"
     );
 
     public function __construct($options)
@@ -172,7 +172,7 @@ class CORE_Validate_DataEntrePeriodo extends Zend_Validate_Abstract
         }
 
         $zdate = new Zend_Date();
-        $minDate = $zdate->subYear($this->_max);
+        $minDate = $zdate->now()->subYear($this->_max);
         $maxDate = $zdate->now()->subYear($this->_min);
 
         $nascimento = new Zend_Date( $value, $this->_formatInput );
