@@ -109,5 +109,4 @@ class CORE_Validate_CPF extends Zend_Validate_Abstract
             $this->_error(self::INVALID_CPF);
         }
     }
-
 }

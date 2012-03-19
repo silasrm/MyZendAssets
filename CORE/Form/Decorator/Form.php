@@ -59,6 +59,7 @@
                     case 'text':
                     case 'textarea':
                     case 'select':
+                    case 'password':
                         $nameClassElement = str_replace(
                             array('[', ']', '{', '}', '(', ')'),
                             '',
