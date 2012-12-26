@@ -1,3 +1,49 @@
 Classes e outros recursos genéricos usados no Zend Framework em alguns projetos.
 
 * Atualizada a pasta CORE para novo padrão usado. A antiga chama-se CORE.OLD.
+
+-----------------------
+
+26/12/2012
+
+Adicionados:
+- CORE/Auth/64KLoop.php
+	Implementação de método de autenticação do Zend_Auth com suporte a 64.000 vezes a geração de hash do hash.
+- CORE/Controller/Action/Helper/Download.php
+	Helper para chamada facilitada de forçar download de arquivo.
+- CORE/Exception/PerfilNotExist.php
+- CORE/Ftp.php
+	Classe para gerenciamento de conexão com FTP.
+- CORE/Ftp/Exception.php
+- CORE/Log.php
+	Refatoração do antigo CORE_Plugin_Log
+- CORE/Model/Exception/RegisterFound.php
+- CORE/Model/Exception/RegisterNotFound.php
+- CORE/Model/Exception/RegisterNotFoundForced.php
+- CORE/Plugin/CheckAcl.php
+	Classe que faz somente a checagem do ACL genericamente. As definições do ACL são por projeto, logo tem que ser separado.
+- CORE/Plugin/PHPExcel.php
+	Loader do PHPExcel.
+- CORE/Sms.php
+	Classe para integração com gateways de SMS.
+- CORE/Sms/Adapter/Abstract.php
+- CORE/Sms/Adapter/RouteSMS.php
+	Implementação do gatewat de SMS da RouteSMS.
+- CORE/Validate/CNPJ.php
+	Validação de CNPJ
+- CORE/Validate/DataMaxima.php
+	Validação se uma data é maior ou igual a outra ou somente maior.
+- CORE/View/Helper/MenuBootstrap.php
+	Integração para geração do Zend_Navigation::menu no estilo Twitter Bootstrap
+
+Removidos: 
+- CORE/BuscaCepAbstract.php
+- CORE/Model/BusinessAbstract.php
+- CORE/Plugin/ACL.php
+- CORE/Plugin/Canvas.php
+- CORE/Plugin/Counter.php
+- CORE/Validate/CorrectPassword.php
+- CORE/View/Helper/GetFoto.php
+- CORE/View/Helper/MassActions.php
+- CORE/View/Helper/RelativetimePt.php
+- CORE/View/Helper/Status.php

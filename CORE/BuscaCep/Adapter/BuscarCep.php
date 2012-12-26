@@ -8,7 +8,7 @@
 	* @name CORE_BuscaCep_Adapter_BuscarCep
 	* @version 0.1
 	*/
-	class CORE_BuscaCep_Adapter_BuscarCep extends CORE_BuscaCepAbstract
+	class CORE_BuscaCep_Adapter_BuscarCep extends CORE_BuscaCep_Adapter_Abstract
 	{
 		protected $url = 'http://www.buscarcep.com.br/?cep={{cep}}&formato=string&chave=1G3v4ZSmI1.o9nigvSlHDlsdbulvEy/';
 	}

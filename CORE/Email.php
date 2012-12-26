@@ -4,7 +4,7 @@
      * Class for sent mail with Zend_Mail
      *
      * @author Silas Ribas <silasrm@gmail.com> github.com/silasrm
-     * @version 0.2.2
+     * @version 0.2.3
      * @package CORE
      * @name Email
      * @example BOOTSTRAP
@@ -16,36 +16,36 @@
             }
 
             CORE_Email::getInstance()->config( array( 'viewPath' =>Zend_Registry::get('config')->core->email->viewPath
-                                                                            , 'alertTo' =>Zend_Registry::get('config')->core->email->alertTo
-                                                                            , 'transport' => $transport
-                                                                            , 'log' => $log ) );
-     * 
+                                                    , 'alertTo' =>Zend_Registry::get('config')->core->email->alertTo
+                                                    , 'transport' => $transport
+                                                    , 'log' => $log ) );
+     *
      * @example MULTIPLES RECIPIENTS AND WITH TEMPLATE
             CORE_Email::getInstance()->setTitle( 'Ola {{nome}}', true, array('nome' => 'Silas Ribas' ) )
-                                                    ->setData( array( 'xya' => 'LUPA UMPA!' ) )
-                                                    ->setTemplate( 'teste.phtml' )
-                                                    ->isHtml() // indicated this message is a html type
-                                                    ->addTo('mariadasilva999999@email.com.br') 
-                                                    ->addTo('mariadasilva9999992@email.com.br')
-                                                    ->send();
+                                    ->setData( array( 'xya' => 'LUPA UMPA!' ) )
+                                    ->setTemplate( 'teste.phtml' )
+                                    ->isHtml() // indicated this message is a html type
+                                    ->addTo('mariadasilva999999@email.com.br')
+                                    ->addTo('mariadasilva9999992@email.com.br')
+                                    ->send();
      *
      * @example USING TEMPLATE BUT IS NOT A HTML MESSAGE, NOT PASSED A PATH FILE OF THE TEMPLATE CODE
             CORE_Email::getInstance()->setTitle( 'Ola {{nome}}', true, array('nome' => 'Silas Ribas' ) )
-                                                    ->setData( array( 'xya' => 'LUPA UMPA!' ) )
-                                                    ->setTemplate( '<h2>{{nome}}</h2>', true )
-                                                    ->isHtml() // indicated this message is a html type
-                                                    ->send( 'mariadasilva9999992@email.com.br' );
+                                        ->setData( array( 'xya' => 'LUPA UMPA!' ) )
+                                        ->setTemplate( '<h2>{{nome}}</h2>', true )
+                                        ->isHtml() // indicated this message is a html type
+                                        ->send( 'mariadasilva9999992@email.com.br' );
      *
      * @example USING HTML CODE IN TEMPLATE, NOT PASSED A PATH FILE OF THE TEMPLATE CODE
             CORE_Email::getInstance()->setTitle( 'Ola {{nome}}', true, array('nome' => 'Silas Ribas' ) )
-                                                    ->setData( array( 'xya' => 'LUPA UMPA!' ) )
-                                                    ->setTemplate( 'Hi {{nome}}.', true )
-                                                    ->send( 'mariadasilva9999992@email.com.br' );
-     * 
+                                    ->setData( array( 'xya' => 'LUPA UMPA!' ) )
+                                    ->setTemplate( 'Hi {{nome}}.', true )
+                                    ->send( 'mariadasilva9999992@email.com.br' );
+     *
      * @example SINGLE RECIPIENT AND WITH TEXT MESSAGE ( NOT HTML MESSAGE )
             CORE_Email::getInstance()->setTitle( 'Ola {{nome}}', true, array('nome' => 'Silas Ribas' ) )
-                                                    ->setMessage('Message for body e-mail')
-                                                    ->send( 'mariadasilva999999@email.com.br' ); // 1 recipient
+                                    ->setMessage('Message for body e-mail')
+                                    ->send( 'mariadasilva999999@email.com.br' ); // 1 recipient
      */
     class CORE_Email
     {
@@ -124,7 +124,7 @@
 
         /**
          *  Return a Zend_Mail instance
-         * 
+         *
          * @return Zend_Mail
          */
         public function getMail()
@@ -134,7 +134,7 @@
 
         /**
          * Set a configuration of the class
-         * 
+         *
          * @param array $config
          * @return CORE_Email
          */
@@ -211,18 +211,25 @@
 
         /**
          * Build a message
-         * 
+         *
          * @return CORE_Email
          */
         public function buildDataInTemplate()
         {
             if( $this->_isCode )
+            {
                 $codeTemplate = $this->_template;
+            }
             else
-                $codeTemplate = $this->_view->partial( $this->_template );
-            
+            {
+                $codeTemplate = $this->_view->partial(
+                    $this->_template,
+                    $this->_data
+                );
+            }
+
             $this->_message = $this->stringf( $codeTemplate, $this->_data );
-            
+
             return self::$_instance;
         }
 
@@ -249,32 +256,32 @@
         {
             if( substr( PHP_VERSION, 0, 3 ) >= 5.3 )
                 return preg_replace_callback( '/{{(\w+)}}/'
-                                            , function( $match ) use( &$vars ) { 
-                                                    return $vars[ $match[ 1 ] ]; 
+                                            , function( $match ) use( &$vars ) {
+                                                    return $vars[ $match[ 1 ] ];
                                                 }
                                             , $template );
             else
                 return preg_replace_callback( '/{{(\w+)}}/'
-                							, create_function( '$match', 'return &$vars[$match[1]];' )
-                							, $template );
+                                            , create_function( '$match', 'return &$vars[$match[1]];' )
+                                            , $template );
         }
 
         /**
          * Return a message in text or html
-         * 
+         *
          * @return string
          */
         public function getMessage()
         {
              if( !empty( $this->_template ) )
                  $this->buildDataInTemplate();
-                
+
             return $this->_message;
         }
 
         /**
          * Set a message text for sent a pure text email
-         * 
+         *
          * @param string $message
          * @return CORE_Email
          */
@@ -282,7 +289,7 @@
         {
             if( !is_string( $message ))
                 throw new InvalidArgumentException( 'Message is not a string.' );
-            
+
             $this->_messageType = 1;
             $this->_message = $message;
 
@@ -304,7 +311,7 @@
 
             // clear subject in Zend_Mail
             $this->getMail()->clearSubject();
-            
+
             $this->_title = $title;
 
             if( $hasVariables )
@@ -357,7 +364,7 @@
 
         /**
          * Sent a email
-         * 
+         *
          * @param string|array $recipient
          * @return boolena|Exception
          */
@@ -385,20 +392,25 @@
 
             if( $this->_messageType == 1 )
             {
-                $this->getMail()->setBodyText( $this->getMessage()
-                                                                , 'UTF-8'
-                                                                , 'UTF-8' );
+                $this->getMail()->setBodyText(
+                    $this->getMessage()
+                    , 'UTF-8'
+                    , 'UTF-8'
+                );
             }
             else
             {
-                $this->getMail()->setBodyHtml( $this->getMessage()
-                                                                    , 'UTF-8'
-                                                                    , 'UTF-8' );
+                $this->getMail()->setBodyHtml(
+                    $this->getMessage()
+                    , 'UTF-8'
+                    , 'UTF-8'
+                );
             }
 
             try
             {
                 $this->getMail()->send( $this->_transport );
+                $this->getMail()->clearRecipients();
 
                 return true;
             }
@@ -427,5 +439,3 @@
             }
         }
     }
-
-?>

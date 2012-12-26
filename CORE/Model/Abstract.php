@@ -2,130 +2,236 @@
 
 abstract class CORE_Model_Abstract
 {
-    private static $_db = null;
-    protected $_dbTable;
-    protected $_log;
+	private static $_db = null;
+	protected $_dbTable;
+	protected $_log;
 
-    public function getDb()
-    {
-        if( is_null(self::$_db) )
-            self::$_db = Zend_Db_Table::getDefaultAdapter();
+	public function getDb()
+	{
+		if( is_null(self::$_db) )
+			self::$_db = Zend_Db_Table::getDefaultAdapter();
 
-        return self::$_db;
-    }
+		return self::$_db;
+	}
 
-    public function getDbTable() 
-    {
-        return $this->_dbTable;
-    }
+	public function getDbTable()
+	{
+		return $this->_dbTable;
+	}
 
-    public function find($id)
-    {
-        $current = $this->_dbTable->find($id)->current();
-        if( !$current )
-            throw new Exception('Registro não encontrado.');
+	public function find($id)
+	{
+		$current = $this->_dbTable->find($id)->current();
+		if( !$current )
+			throw new CORE_Model_Exception_RegisterNotFound;
 
-        return $current;
-    }
+		return $current->toArray();
+	}
 
-    public function save(array $data)
-    {
-        if (isset($data['id'])) {
-            return $this->_update($data);
-        } else {
-            return $this->_insert($data);
-        }
-    }
+	public function save(array $data)
+	{
+		if (isset($data['id'])) {
+			return $this->_update($data);
+		} else {
+			return $this->_insert($data);
+		}
+	}
 
-    public function delete($id)
-    {
-        return $this->_dbTable->delete('id=' . $id);
-    }
+	public function delete($id)
+	{
+		$where = array(
+			'id = ?' => $id
+		);
 
-    public function fetchPair( $conditions = null )
-    {
-        $query = $this->_dbTable->select();
-        $query->from( $this->_dbTable->getName() );
+		if( is_array($id))
+		{
+			$where = array(
+				'id in (?)' => $id
+			);
+		}
 
-        if (!is_null($conditions)) {
-            foreach ($conditions as $ky => $condition) {
-                $query->where($ky, $condition);
-            }
-        }
-        
-        return $this->getDb()->fetchPairs($query);
-    }
+		return $this->_dbTable->delete($where);
+	}
 
-    public function fetchAll($params=null)
-    {
-        $page = isset($params['page']) ? (int) $params['page'] : 1;
-        $perage = isset($params['perpage']) ? (int) $params['perpage'] : 10;
+	public function fetchPairs(array $conditions = null, $orders = null, $cols = array('*') )
+	{
+		$sql = $this->_dbTable->select();
+		$sql->from( $this->_dbTable->getName(), $cols );
 
-        $paginator = Zend_Paginator::factory($this->_dbTable->fetchAll());
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage($perage);
-        return $paginator;
-    }
+		$this->_trataCondicoes( $sql, $conditions );
+		$this->_trataOrdem( $sql, $orders );
 
-    public function getAll($conditions = null)
-    {
-        $sql = $this->_dbTable->getAdapter()            
-                        ->select()
-                        ->from( $this->_dbTable->getName() );
-        
-        if (!is_null($conditions)) {
-            foreach ($conditions as $ky => $condition) {
-                $sql->where($ky, $condition);
-            }
-        }
+		return $this->getDb()->fetchPairs($sql);
+	}
 
-        return $sql->query()->fetchAll();
-    }
+	public function fetchAll($conditions = null, $limit = null, $orders = null, Zend_Db_Select $sql = null, $cols = array('*') )
+	{
+		if( is_null($sql) )
+		{
+			$sql = $this->_dbTable
+						->getAdapter()
+						->select()
+						->from( $this->_dbTable->getName(), $cols );
+		}
 
-    public function search(array $params)
-    {
-        $str = isset($params['str']) ? $params['str'] : "";
-        $filtro = isset($params['filtro']) ? $params['filtro'] : "";
-        $page = isset($params['page']) ? (int) $params['page'] : 1;
-        $perPage = isset($params['perpage']) 
-                    ? (int) $params['perpage'] 
-                    : Zend_Registry::get('config')->paginator->totalItemPerPage;
-        $limit = ( $page - 1 ) * $perPage;
-        $where = null;
-        $select = $this->_dbTable->select();
+		$this->_trataCondicoes( $sql, $conditions );
+		$this->_trataOrdem( $sql, $orders );
 
-        if (!empty($str)) {
-            $select->where($filtro . " like '%" . $str . "%'");
-        }
+		if( !is_null($limit) || $limit != 0 )
+		{
+			$sql->limit($limit);
+		}
 
-        if ( !is_null($limit) || $limit != 0 )
-            $select->limit($perPage, $limit);
+		return $sql->query()->fetchAll();
+	}
 
-        $paginator = Zend_Paginator::factory($select);
-        $paginator->setCurrentPageNumber($page);
-        $paginator->setItemCountPerPage($perPage);
-        
-        return $paginator;
-    }
+	public function fetch($conditions = null, $orders = null, Zend_Db_Select $sql = null, $cols = array('*') )
+	{
+		if( is_null($sql) )
+		{
+			$sql = $this->_dbTable
+						->getAdapter()
+						->select()
+						->from( $this->_dbTable->getName(), $cols );
+		}
 
-    public function getAsArray( $id ) {
-        return $this->find($id)->toArray();
-    }
+		$this->_trataCondicoes( $sql, $conditions );
+		$this->_trataOrdem( $sql, $orders );
 
-    public function _insert(array $data)
-    { 
-        return $this->_dbTable->insert($data);
-    }
+		return $sql->query()->fetch();
+	}
 
-    public function _update(array $data)
-    {
-        $id = $data['id'];
-        unset($data['id']);
+	public function count(array $conditions = null)
+	{
+		$sql = $this->_dbTable
+					->getAdapter()
+					->select()
+					->from( $this->_dbTable->getName(), array( 'total' => 'COUNT(id)' ) );
 
-        return $this->_dbTable->update($data, array('id = ?' => $id ));
-    }
+		$this->_trataCondicoes( $sql, $conditions );
 
-    #abstract public function _insert(array $data);
+		$data = $sql->query()->fetch();
 
-    #abstract public function _update(array $data);
+		return $data['total'];
+	}
+
+	public function search(array $params)
+	{
+		$str = isset($params['str']) ? $params['str'] : "";
+		$conditions = isset($params['conditions']) ? $params['conditions'] : array();
+		$ordem = isset($params['ordem']) ? $params['ordem'] : null;
+		$grupo = isset($params['grupo']) ? $params['grupo'] : null;
+		$page = isset($params['pagina']) ? (int) $params['pagina'] : 1;
+		$perPage = isset($params['perpage'])
+					? (int) $params['perpage']
+					: Zend_Registry::get('config')->paginator->totalItemPerPage;
+		$limit = ( $page - 1 ) * $perPage;
+		$where = null;
+		$sql = $this->_dbTable
+					->select();
+
+		if( !is_null($ordem) )
+		{
+			$this->_trataOrdem( $sql, $ordem );
+		}
+
+		if( !is_null($grupo) )
+		{
+			$this->_trataGrupo( $sql, $grupo );
+		}
+
+		$this->_trataCondicoes( $sql, $conditions );
+
+		if ( !is_null($limit) || $limit != 0 )
+		{
+			$sql->limit($perPage, $limit);
+		}
+
+		$paginator = Zend_Paginator::factory($sql);
+		$paginator->setCurrentPageNumber($page);
+		$paginator->setItemCountPerPage($perPage);
+
+		return $paginator;
+	}
+
+	public function getAsArray( $id ) {
+		return $this->find($id)->toArray();
+	}
+
+	public function _insert(array $data)
+	{
+		return $this->_dbTable->insert($data);
+	}
+
+	public function _update(array $data)
+	{
+		$id = $data['id'];
+		unset($data['id']);
+
+		return $this->_dbTable->update($data, array('id = ?' => $id ));
+	}
+
+	protected function _trataCondicoes( Zend_Db_Select &$sql, array $conditions = null )
+	{
+		if (!is_null($conditions)) {
+			foreach ($conditions as $key => $condition) {
+				if( !is_array($condition) )
+				{
+					if( !is_numeric( $key ) )
+					{
+						$sql->where($key, $condition);
+					}
+					else
+					{
+						$sql->where($condition);
+					}
+				}
+				else
+				{
+					if( array_key_exists(1, $condition) && $condition[1] == 'OR' )
+					{
+						$sql->orWhere($key, $condition[0]);
+					}
+					else
+					{
+						$sql->where($key, $condition);
+					}
+				}
+			}
+		}
+	}
+
+	protected function _trataOrdem( Zend_Db_Select &$sql, $orders = null )
+	{
+		if( !is_null($orders) )
+		{
+			if( is_array($orders) )
+			{
+				foreach ($orders as $order) {
+					$sql->order($order);
+				}
+			}
+			else
+			{
+				$sql->order($orders);
+			}
+		}
+	}
+
+	protected function _trataGrupo( Zend_Db_Select &$sql, $grupos = null )
+	{
+		if( !is_null($grupos) )
+		{
+			if( is_array($grupos) )
+			{
+				foreach ($grupos as $grupo) {
+					$sql->group($grupo);
+				}
+			}
+			else
+			{
+				$sql->group($grupos);
+			}
+		}
+	}
 }

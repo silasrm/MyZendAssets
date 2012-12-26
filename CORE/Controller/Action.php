@@ -11,7 +11,7 @@ class CORE_Controller_Action extends Zend_Controller_Action
 	protected $_data = null;
 	protected $_auth = false;
 	protected $flashMessenger = null;
-    public $_infoUser = null;
+    protected $_infoUser = null;
     protected $_tipoPagina = 'normal';
     protected $_eUsuario = false;
 

@@ -12,7 +12,7 @@
 	{
 		private $adapter = null;
 		
-		public function __construct( $adapter = null )
+		public function __construct( CORE_BuscaCep_Adapter_Abstract $adapter = null )
 		{
 			if( !is_null( $adapter ) )
 				$this->setAdapter( $adapter );

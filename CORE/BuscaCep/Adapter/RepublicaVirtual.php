@@ -8,7 +8,7 @@
 	* @name CORE_BuscaCep_Adapter_RepublicaVirtual
 	* @version 0.1
 	*/
-	class CORE_BuscaCep_Adapter_RepublicaVirtual extends CORE_BuscaCepAbstract
+	class CORE_BuscaCep_Adapter_RepublicaVirtual extends CORE_BuscaCep_Adapter_Abstract
 	{
 		protected $url = 'http://cep.republicavirtual.com.br/web_cep.php?cep={{cep}}&formato=query_string';
 	}

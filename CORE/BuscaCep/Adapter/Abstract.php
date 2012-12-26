@@ -8,7 +8,7 @@
 	* @name CORE_BuscaCepAbstract
 	* @version 0.1
 	*/
-	abstract class CORE_BuscaCepAbstract
+	abstract class CORE_BuscaCep_Adapter_Abstract
 	{
 		protected $cep = null;
 		protected $url = null;
