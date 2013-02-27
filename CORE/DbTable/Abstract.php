@@ -3,7 +3,7 @@
 abstract class CORE_DbTable_Abstract extends Zend_Db_Table_Abstract
 {
 
-    protected $_conventionTableName = 'upper';
+    protected $_conventionTableName = 'lower';
 
     protected function _setupTableName() {
         switch ($this->_conventionTableName) {
