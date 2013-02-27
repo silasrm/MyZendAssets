@@ -54,4 +54,26 @@ class CORE_Controller_Action extends Zend_Controller_Action
 	        }
 		}
 	}
+
+	protected function _limpaParametros()
+	{
+		$params = $this->getRequest()->getParams();
+
+		unset($params['controller']);
+        unset($params['action']);
+        unset($params['module']);
+        unset($params['submit']);
+
+        return $params;
+	}
+    
+    protected function _messages() {
+        $this->view->messages = array_merge(
+            $this->flashMessenger->getMessages(),
+            $this->flashMessenger->getCurrentMessages()
+        );
+        $this->flashMessenger->clearCurrentMessages();        
+    }
+
+
 }
