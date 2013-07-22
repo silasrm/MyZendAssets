@@ -4,6 +4,24 @@ Classes e outros recursos genéricos usados no Zend Framework em alguns projetos
 
 -----------------------
 
+22/07/2013
+
+Adicionados:
+- CORE/CalculoPrice.php
+	Faz cálculo da tabela Price
+- CORE/Profiler/File.php
+	Faz profiler direto em um arquivo.
+
+Corrigidos:
+- CORE/Log.php
+	Corrigido bug no instânciamento do Writer.
+
+27/02/2013
+
+Corrigidos:
+- CORE/DbTable/Abstract.php
+	Corrigida configuração de convenção de nome de tabela de Upper para Lower.
+
 26/12/2012
 
 Adicionados:
@@ -36,7 +54,7 @@ Adicionados:
 - CORE/View/Helper/MenuBootstrap.php
 	Integração para geração do Zend_Navigation::menu no estilo Twitter Bootstrap
 
-Removidos: 
+Removidos:
 - CORE/BuscaCepAbstract.php
 - CORE/Model/BusinessAbstract.php
 - CORE/Plugin/ACL.php
