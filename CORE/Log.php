@@ -89,15 +89,19 @@ class CORE_Log extends Zend_Log
 	{
 		if( is_null( $destino ) )
 		{
-			$destino = $this->getDestinoPadrao();
+			if( empty($this->_writers) )
+			{
+				$destino = $this->getDestinoPadrao();
+				$writer = new Zend_Log_Writer_Stream( $destino );
+				$this->addWriter($writer);
+			}
 		}
 		else
 		{
 			$destino = realpath( DATA_PATH . '/logs/' . $destino );
+			$writer = new Zend_Log_Writer_Stream( $destino );
+			$this->addWriter($writer);
 		}
-
-		$writer = new Zend_Log_Writer_Stream( $destino );
-		$this->addWriter($writer);
 
 		parent::log( $mensagem , $prioridade, $extras );
 
