@@ -14,9 +14,11 @@ abstract class CORE_Model_Abstract
 		return self::$_db;
 	}
 
-	public function getDbTable()
+	public function getDbTable($sufixo = null)
 	{
-		return $this->_dbTable;
+		$dbTable = ( !empty($sufixo)?'_dbTable' . $sufixo:'_dbTable');
+
+		return $this->$dbTable;
 	}
 
 	public function find($id)
@@ -233,5 +235,15 @@ abstract class CORE_Model_Abstract
 				$sql->group($grupos);
 			}
 		}
+	}
+
+	public function getDbTableTemporaria()
+	{
+		return $this->_dbTableTemporaria;
+	}
+
+	public function setDbTableTemporaria($dbTableTemporaria)
+	{
+		return $this->_dbTableTemporaria = $dbTableTemporaria;
 	}
 }

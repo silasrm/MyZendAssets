@@ -4,6 +4,19 @@ Classes e outros recursos genéricos usados no Zend Framework em alguns projetos
 
 -----------------------
 
+15/09/2013
+
+Atualizados:
+- CORE/Model/Abstract.php
+	Adicionado sufixo no getDbTable()
+- CORE/View/Helper/ShortText.php
+	Adicionada opção de cortar ou não palavra no shortText
+
+Adicionados:
+- CORE/Validate/Vimeo/VideoExists.php
+- CORE/Vimeo.php
+	Adicionada classe e helper para trabalhar com vídeos do Vimeo
+
 22/07/2013
 
 Adicionados:
