@@ -16,6 +16,8 @@ Adicionados:
 - CORE/Validate/Vimeo/VideoExists.php
 - CORE/Vimeo.php
 	Adicionada classe e helper para trabalhar com vídeos do Vimeo
+- CORE/BuscaCep/Adapter/Postmon.php
+	Adapter dos Postmon para a busca de cep.
 
 22/07/2013
 
