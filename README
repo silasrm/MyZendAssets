@@ -11,6 +11,8 @@ Atualizados:
 	Adicionado sufixo no getDbTable()
 - CORE/View/Helper/ShortText.php
 	Adicionada opção de cortar ou não palavra no shortText
+- CORE/View/Helper/MenuBootstrap.php
+	Adicionado suporte a estrutra stacked. Refatorado código de checagem de subpagina ativa.
 
 Adicionados:
 - CORE/Validate/Vimeo/VideoExists.php
