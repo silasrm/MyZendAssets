@@ -37,6 +37,16 @@ class CORE_Log extends Zend_Log
         'erros.log',
     );
 
+    /**
+     * Tamanho máximo para o arquivo de log
+     * @var int
+     */
+    private $_maxSize = 5242880; // In bytes. 5MB
+
+    /**
+     * @param null|Zend_Log_Writer_Abstract $path
+     * @param Zend_Log_Writer_Abstract $writer
+     */
     public function __construct($path, Zend_Log_Writer_Abstract $writer = null)
     {
         $this->setPath($path);
@@ -47,31 +57,52 @@ class CORE_Log extends Zend_Log
         parent::__construct($writer);
     }
 
+    /**
+     * @return string
+     */
     public function getPath()
     {
         return $this->_path;
     }
 
+    /**
+     * @param $path
+     * @return mixed
+     */
     public function setPath($path)
     {
         return $this->_path = $path;
     }
 
+    /**
+     * @return string
+     */
     public function getDestinoPadrao()
     {
         return $this->_destinoPadrao;
     }
 
+    /**
+     * @param $destinoPadrao
+     * @return mixed
+     */
     public function setDestinoPadrao($destinoPadrao)
     {
         return $this->_destinoPadrao = $destinoPadrao;
     }
 
+    /**
+     * @return array
+     */
     public function getArquivosPrincipais()
     {
         return $this->_arquivosPrincipais;
     }
 
+    /**
+     * @param $arquivosPrincipais
+     * @return array
+     */
     public function setArquivosPrincipais($arquivosPrincipais)
     {
         return $this->_arquivosPrincipais = array_merge($this->getArquivosPrincipais(), $arquivosPrincipais);
@@ -94,6 +125,8 @@ class CORE_Log extends Zend_Log
             $destino = realpath(DATA_PATH . '/logs/' . $destino);
         }
 
+        $this->_checaTamanhoArquivo($destino);
+
         $writer = new Zend_Log_Writer_Stream($destino);
         $this->addWriter($writer);
 
@@ -102,6 +135,10 @@ class CORE_Log extends Zend_Log
         return $this;
     }
 
+    /**
+     * @param $mensagem
+     * @return Zend_Log
+     */
     public function logErro($mensagem)
     {
         return $this->log(
@@ -111,6 +148,10 @@ class CORE_Log extends Zend_Log
         );
     }
 
+    /**
+     * @param array $arquivosExtras
+     * @return $this
+     */
     public function iniciaConfig(array $arquivosExtras = null)
     {
         if (!is_null($arquivosExtras) && count($arquivosExtras) > 0) {
@@ -124,6 +165,10 @@ class CORE_Log extends Zend_Log
         return $this;
     }
 
+    /**
+     * @param $arquivo
+     * @return $this
+     */
     private function _criaArquivo($arquivo)
     {
         if (!file_exists($arquivo)) {
@@ -147,5 +192,30 @@ class CORE_Log extends Zend_Log
         }
 
         return $this;
+    }
+
+    /**
+     * @param $arquivo
+     */
+    private function _checaTamanhoArquivo($arquivo)
+    {
+        if (file_exists($arquivo)
+            && filesize($arquivo) > $this->_maxSize
+        ) {
+            $fileInfo = pathinfo($arquivo);
+            $nb = 1;
+            $logfiles = scandir($fileInfo['dirname']);
+            foreach ($logfiles as $file) {
+                $tmpnb = substr($file, strlen($fileInfo['basename']));
+                if ($nb < $tmpnb) {
+                    $nb = $tmpnb;
+                }
+            }
+
+            rename(
+                $fileInfo['dirname'] . '/' . $fileInfo['basename'],
+                $fileInfo['dirname'] . '/' . $fileInfo['basename'] . '.' . ($nb + 1)
+            );
+        }
     }
 }
