@@ -224,10 +224,6 @@ class CORE_Validate_DataEntrePeriodo extends Zend_Validate_Abstract
 
         $this->_minDate = new Zend_Date($this->_min, $this->_format);
         $this->_maxDate = new Zend_Date($this->_max, $this->_format);
-//        Zend_Debug::dump($this->_minDate->get($this->_format));
-//        Zend_Debug::dump($this->_maxDate->get($this->_format));
-//        Zend_Debug::dump($valueDate->get($this->_format));
-//        die;
 
         if ($this->getInclusive()
             && (($valueDate->equals($this->_minDate) && !$valueDate->equals($this->_maxDate))
