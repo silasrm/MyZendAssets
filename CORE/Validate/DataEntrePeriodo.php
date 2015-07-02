@@ -2,54 +2,98 @@
 
 require_once 'Zend/Validate/Abstract.php';
 
+/**
+ * Class CORE_Validate_DataEntrePeriodo
+ */
 class CORE_Validate_DataEntrePeriodo extends Zend_Validate_Abstract
 {
+    /**
+     *
+     */
     const NOT_DATE = 'notDate';
+    /**
+     *
+     */
     const NOT_BETWEEN = 'notBetween';
- 
-    public $_min = 0;
+
+    /**
+     * @var string
+     */
+    public $_min = null;
+
+    /**
+     * @var string
+     */
+    public $_max = null;
+
+    /**
+     * @var Zend_Date
+     */
     public $_minDate = null;
-    public $_max = 100;
+
+    /**
+     * @var Zend_Date
+     */
     public $_maxDate = null;
-    public $_formatInput = 'dd/MM/yyyy';
-    public $_formatCompare = 'MM/yyyy';
- 
+
+    /**
+     * @var string
+     */
+    public $_minDateMark = null;
+
+    /**
+     * @var string
+     */
+    public $_maxDateMark = null;
+
+    /**
+     * @var string
+     */
+    public $_format = 'dd/MM/yyyy';
+
+    /**
+     * @var string
+     */
+    public $_inclusive = false;
+
+    /**
+     * @var array
+     */
     protected $_messageVariables = array(
-        'min' => '_minDate',
-        'max' => '_maxDate',
-        'minIdade' => '_min',
-        'maxIdade' => '_max'
-    );
- 
-    protected $_messageTemplates = array(
-        self::NOT_DATE => "'%value%' não é uma data válida",
-        self::NOT_BETWEEN => "'%value%' deve estar entre '%min%' ( %maxIdade% anos ) e '%max%'  ( %minIdade% anos )"
+        'min' => '_minDateMark',
+        'max' => '_maxDateMark',
     );
 
+    /**
+     * @var array
+     */
+    protected $_messageTemplates = array(
+        self::NOT_DATE => "'%value%' não é uma data válida",
+        self::NOT_BETWEEN => "'%value%' deve estar entre '%min%' e '%max%'"
+    );
+
+    /**
+     * @param $options
+     * @throws Zend_Validate_Exception
+     */
     public function __construct($options)
     {
-        if( $options instanceof Zend_Config )
-        {
+        if ($options instanceof Zend_Config) {
             $options = $options->toArray();
-        }
-        else if( !is_array($options) )
-        {
+        } else if (!is_array($options)) {
             $options = func_get_args();
             $temp['min'] = array_shift($options);
 
-            if( !empty($options) )
-            {
+            if (!empty($options)) {
                 $temp['max'] = array_shift($options);
             }
 
-            if( !empty($options) )
-            {
-                $temp['format_input'] = $options['format_input'];
+            if (!empty($options)) {
+                $temp['format'] = $options['format'];
             }
 
-            if( !empty($options) )
-            {
-                $temp['format_compare'] = $options['format_compare'];
+            if (!empty($options)) {
+                $temp['inclusive'] = $options['inclusive'];
             }
 
             $options = $temp;
@@ -60,15 +104,16 @@ class CORE_Validate_DataEntrePeriodo extends Zend_Validate_Abstract
             throw new Zend_Validate_Exception("Faltando definir o 'min' e 'max' de anos.");
         }
 
-        $this->setMin($options['min'])
-             ->setMax($options['max']);
+        $this
+            ->setMin($options['min'])
+            ->setMax($options['max']);
 
-        if (array_key_exists('format_input', $options)) {
-            $this->setFormatInput($options['format_input']);
+        if (array_key_exists('format', $options)) {
+            $this->setFormat($options['format']);
         }
 
-        if (array_key_exists('format_compare', $options)) {
-            $this->setFormatCompare($options['format_compare']);
+        if (array_key_exists('inclusive', $options)) {
+            $this->setInclusive($options['inclusive']);
         }
     }
 
@@ -117,73 +162,86 @@ class CORE_Validate_DataEntrePeriodo extends Zend_Validate_Abstract
     }
 
     /**
-     * Returns the format_input option
+     * Returns the format option
      *
      * @return boolean
      */
-    public function getFormatInput()
+    public function getFormat()
     {
-        return $this->_formatInput;
+        return $this->_format;
     }
 
     /**
-     * Sets the format_input option
+     * Sets the format option
      *
-     * @param  boolean $formatInput
+     * @param  boolean $format
      * @return CORE_Validate_DataEntrePeriodo Provides a fluent interface
      */
-    public function setFormatInput($formatInput)
+    public function setFormat($format)
     {
-        $this->_formatInput = $formatInput;
+        $this->_format = $format;
         return $this;
     }
 
     /**
-     * Returns the format_compare option
-     *
-     * @return boolean
+     * @return string
      */
-    public function getFormatCompare()
+    public function getInclusive()
     {
-        return $this->_formatCompare;
+        return $this->_inclusive;
     }
 
     /**
-     * Sets the format_compare option
-     *
-     * @param  boolean $formatCompare
-     * @return CORE_Validate_DataEntrePeriodo Provides a fluent interface
+     * @param string $inclusive
+     * @return CORE_Validate_DataEntrePeriodo
      */
-    public function setFormatCompare($formatCompare)
+    public function setInclusive($inclusive)
     {
-        $this->_formatCompare = $formatCompare;
+        $this->_inclusive = $inclusive;
         return $this;
     }
 
-    public function isValid( $value )
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function isValid($value)
     {
-        $this->_setValue($value);
-
-        if( !Zend_Date::isDate($value, $this->_formatInput) )
-        {
+        if (!$value instanceof Zend_Date
+            && !Zend_Date::isDate($value, $this->_format)) {
             $this->_error(self::NOT_DATE);
 
             return false;
         }
 
-        $zdate = new Zend_Date();
-        $minDate = $zdate->now()->subYear($this->_max);
-        $maxDate = $zdate->now()->subYear($this->_min);
+        if (!$value instanceof Zend_Date) {
+            $valueDate = new Zend_Date($value, $this->_format);
+        } else {
+            $valueDate = $value;
+        }
 
-        $nascimento = new Zend_Date( $value, $this->_formatInput );
+        $this->_setValue($valueDate->get($this->_format));
 
-        // Se Nascimento é ANTES da data mínima 
+        $this->_minDate = new Zend_Date($this->_min, $this->_format);
+        $this->_maxDate = new Zend_Date($this->_max, $this->_format);
+//        Zend_Debug::dump($this->_minDate->get($this->_format));
+//        Zend_Debug::dump($this->_maxDate->get($this->_format));
+//        Zend_Debug::dump($valueDate->get($this->_format));
+//        die;
+
+        if ($this->getInclusive()
+            && (($valueDate->equals($this->_minDate) && !$valueDate->equals($this->_maxDate))
+                || (!$valueDate->equals($this->_minDate) && $valueDate->equals($this->_maxDate)))
+        ) {
+            return true;
+        }
+
+        // Se DataBase é ANTES da data mínima
         // Ou DEPOIS da data máxima
-        if( $nascimento->isEarlier( $minDate, $this->_formatCompare ) 
-            || $nascimento->isLater( $maxDate, $this->_formatCompare ) )
-        {
-            $this->_minDate = $zdate->setDate( $minDate )->get( $this->_formatCompare );
-            $this->_maxDate = $zdate->setDate( $maxDate )->get( $this->_formatCompare );
+        if ($valueDate->isEarlier($this->_minDate)
+            || $valueDate->isLater($this->_maxDate)) {
+            $this->_minDateMark = $this->_minDate->get($this->_format);
+            $this->_maxDateMark = $this->_maxDate->get($this->_format);
 
             $this->_error(self::NOT_BETWEEN);
             return false;
